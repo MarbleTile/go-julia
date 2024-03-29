@@ -1,10 +1,13 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"math"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/gdamore/tcell/v2"
 )
@@ -69,27 +72,52 @@ func draw_frame(s tcell.Screen, styles []tcell.Style, zoom, pos_x, pos_y float32
     }
 }
 
+func cmd_usage() {
+    fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [OPTION]... [REAL] [IMAGINARY]\n", os.Args[0])
+    fmt.Fprintf(flag.CommandLine.Output(), "Render Julia set at given complex constant.\nArrow keys to move, +/- to zoom.\n\n")
+    fmt.Fprintf(flag.CommandLine.Output(), "REAL and IMAGINARY are the real and imaginary components of a complex constant.\nWith no REAL and IMAGINARY, constant is -0.8+0.156i.\n\n")
+    flag.PrintDefaults()
+}
+
 const MAX_IT int = 100
 const FACTOR float32 = 1/(float32(MAX_IT)-1)
-var BEGIN_COLOR = [3]int32{0, 255, 0}
+var BEGIN_COLOR = [3]int32{0, 0, 0}
 var END_COLOR = [3]int32{0, 0, 0}
 var JULIA_CONST_RE float32 = -0.8
 var JULIA_CONST_IM float32 = 0.156
 //var RADIUS float32 = (1.0+float32(math.Sqrt(1.0-4.0*math.Sqrt(float64(JULIA_CONST_RE*JULIA_CONST_RE+JULIA_CONST_IM*JULIA_CONST_IM)))))/2.0
 const RADIUS float32 = 2.0
 func main() {
+    mod_begin_color := flag.String("c1", "0,255,0", "color 1 in RGB list format")
+    mod_end_color := flag.String("c2", "0,0,0", "color 2 in RGB list format")
+//    do_spin := flag.Bool("spin", false, "changes constant with time")
+
+    flag.Usage = cmd_usage
+
+    flag.Parse()
+
+    mod_jul_const := flag.Args()
+    if len(mod_jul_const) == 2 {
+        re, _ := strconv.ParseFloat(mod_jul_const[0], 32)
+        im, _ := strconv.ParseFloat(mod_jul_const[1], 32)
+        JULIA_CONST_RE = float32(re)
+        JULIA_CONST_IM = float32(im)
+    }
+
+    for idx, col := range strings.Split(*mod_begin_color, ",") {
+        num, _ := strconv.ParseInt(col, 10, 32)
+        BEGIN_COLOR[idx] = int32(num)
+    }
+
+    for idx, col := range strings.Split(*mod_end_color, ",") {
+        num, _ := strconv.ParseInt(col, 10, 32)
+        END_COLOR[idx] = int32(num)
+    }
+
     s := init_tcell()
     default_style := tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset)
     s.SetStyle(default_style)
     s.Clear()
-
-    args := os.Args[1:]
-    if len(args) == 2 {
-        re, _ := strconv.ParseFloat(args[0], 32)
-        im, _ := strconv.ParseFloat(args[1], 32)
-        JULIA_CONST_RE = float32(re)
-        JULIA_CONST_IM = float32(im)
-    }
 
     styles := append(make_styles(), tcell.StyleDefault.Foreground(tcell.ColorBlack).Background(tcell.ColorReset))
     var zoom float32 = 1.0
