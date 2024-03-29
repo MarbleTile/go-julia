@@ -134,7 +134,7 @@ func main() {
     s.SetStyle(default_style)
     s.Clear()
 
-    styles := append(make_styles(), tcell.StyleDefault.Foreground(tcell.ColorBlack).Background(tcell.ColorReset))
+    styles := append(make_styles(), tcell.StyleDefault.Foreground(tcell.ColorBlack).Background(tcell.ColorBlack))
     var zoom float32 = 1.0
     const d_zoom float32 = 0.5
     var pos_x float32 = 0.0
