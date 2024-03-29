@@ -90,8 +90,8 @@ func increment_constant() {
     JULIA_CONST_IM = float32(0.7885*math.Sin(float64(JULIA_CONST_SPIN)))
 }
 
-const MAX_IT int = 100
-const FACTOR float32 = 1/(float32(MAX_IT)-1)
+var MAX_IT int = 100
+var FACTOR float32 = 1/(float32(MAX_IT)-1)
 var BEGIN_COLOR = [3]int32{0, 0, 0}
 var END_COLOR = [3]int32{0, 0, 0}
 var JULIA_CONST_RE float32 = -0.8
@@ -103,6 +103,7 @@ const JULIA_CONST_INC float32 = 0.01*math.Pi
 func main() {
     mod_begin_color := flag.String("c1", "0,255,0", "color 1 in RGB list format")
     mod_end_color := flag.String("c2", "0,0,0", "color 2 in RGB list format")
+    mod_max_it := flag.Int("it", 100, "maximum iterations")
 
     flag.Usage = cmd_usage
 
@@ -125,6 +126,8 @@ func main() {
         num, _ := strconv.ParseInt(col, 10, 32)
         END_COLOR[idx] = int32(num)
     }
+
+    MAX_IT = *mod_max_it
 
     s := init_tcell()
     default_style := tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset)
