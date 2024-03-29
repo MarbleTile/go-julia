@@ -54,8 +54,8 @@ func draw_frame(s tcell.Screen, styles []tcell.Style, zoom, pos_x, pos_y float32
 
     for i := 0; i < sz_x; i++ {
         for j := 0; j < sz_y; j++ {
-            re := ((float32(i) - pos_x)/zoom)/(float32(sz_x-1)/zoom)*(2.0*esc)-esc
-            im := ((float32(j) - pos_y)/zoom)/(float32(sz_y-1)/zoom)*(2.0*esc)-esc
+            re := ((float32(i)/zoom) - pos_x)/(float32(sz_x-1)/zoom)*(2.0*esc)-esc
+            im := ((float32(j)/zoom) - pos_y)/(float32(sz_y-1)/zoom)*(2.0*esc)-esc
             
             it := 0
             for magnitude(re, im) < RADIUS*RADIUS && it < MAX_IT {
@@ -96,7 +96,7 @@ func main() {
     const d_zoom float32 = 0.5
     var pos_x float32 = 0.0
     var pos_y float32 = 0.0
-    const d_pos float32 = 10.0
+    var d_pos float32 = 1.0
     draw_frame(s, styles, zoom, pos_x, pos_y)
 
     for {
@@ -130,10 +130,12 @@ func main() {
             if ev.Key() == tcell.KeyRune {
                 if ev.Rune() == '+' || ev.Rune() == '=' {
                     zoom += d_zoom
+                    d_pos = 1.0/zoom
                     draw_frame(s, styles, zoom, pos_x, pos_y)
                 }
                 if (ev.Rune() == '-' || ev.Rune() == '_') && zoom > 0.0 {
                     zoom -= d_zoom
+                    d_pos = 1.0/zoom
                     draw_frame(s, styles, zoom, pos_x, pos_y)
                 }
                 if ev.Rune() == ' ' {
