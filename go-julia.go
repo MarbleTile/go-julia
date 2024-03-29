@@ -4,6 +4,7 @@ import (
 	"log"
 	"math"
 	"os"
+	"strconv"
 
 	"github.com/gdamore/tcell/v2"
 )
@@ -72,8 +73,8 @@ const MAX_IT int = 100
 const FACTOR float32 = 1/(float32(MAX_IT)-1)
 var BEGIN_COLOR = [3]int32{0, 255, 0}
 var END_COLOR = [3]int32{0, 0, 0}
-const JULIA_CONST_RE float32 = -0.8
-const JULIA_CONST_IM float32 = 0.156
+var JULIA_CONST_RE float32 = -0.8
+var JULIA_CONST_IM float32 = 0.156
 //var RADIUS float32 = (1.0+float32(math.Sqrt(1.0-4.0*math.Sqrt(float64(JULIA_CONST_RE*JULIA_CONST_RE+JULIA_CONST_IM*JULIA_CONST_IM)))))/2.0
 const RADIUS float32 = 2.0
 func main() {
@@ -81,6 +82,14 @@ func main() {
     default_style := tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset)
     s.SetStyle(default_style)
     s.Clear()
+
+    args := os.Args[1:]
+    if len(args) == 2 {
+        re, _ := strconv.ParseFloat(args[0], 32)
+        im, _ := strconv.ParseFloat(args[1], 32)
+        JULIA_CONST_RE = float32(re)
+        JULIA_CONST_IM = float32(im)
+    }
 
     styles := append(make_styles(), tcell.StyleDefault.Foreground(tcell.ColorBlack).Background(tcell.ColorReset))
     var zoom float32 = 1.0
