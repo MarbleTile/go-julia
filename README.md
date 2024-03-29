@@ -1,7 +1,7 @@
 # go-julia
-julia set renderer powered by tcell. default constant $$c$$ is -0.8+0.156i
+julia set renderer powered by tcell. default constant $c$ is -0.8+0.156i
 
-calculated via $$f(z)=z^{2}+c$$
+calculated via $f(z)=z^{2}+c$
 
 ### usage
 * first argument sets real component of constant
