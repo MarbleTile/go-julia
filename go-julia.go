@@ -74,9 +74,20 @@ func draw_frame(s tcell.Screen, styles []tcell.Style, zoom, pos_x, pos_y float32
 
 func cmd_usage() {
     fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [OPTION]... [REAL] [IMAGINARY]\n", os.Args[0])
-    fmt.Fprintf(flag.CommandLine.Output(), "Render Julia set at given complex constant.\nArrow keys to move, +/- to zoom.\n\n")
+    fmt.Fprintf(flag.CommandLine.Output(), "Render Julia set at given complex constant.\nArrow keys to move, +/- to zoom.\nHold r or s to move between constants.\n\n")
     fmt.Fprintf(flag.CommandLine.Output(), "REAL and IMAGINARY are the real and imaginary components of a complex constant.\nWith no REAL and IMAGINARY, constant is -0.8+0.156i.\n\n")
     flag.PrintDefaults()
+}
+
+// 0.7885e^{i*a}
+func increment_constant() {
+    if JULIA_CONST_SPIN == 2*math.Pi {
+        JULIA_CONST_SPIN = 0.0
+    } else {
+        JULIA_CONST_SPIN += JULIA_CONST_INC
+    }
+    JULIA_CONST_RE = float32(0.7885*math.Cos(float64(JULIA_CONST_SPIN)))
+    JULIA_CONST_IM = float32(0.7885*math.Sin(float64(JULIA_CONST_SPIN)))
 }
 
 const MAX_IT int = 100
@@ -87,10 +98,11 @@ var JULIA_CONST_RE float32 = -0.8
 var JULIA_CONST_IM float32 = 0.156
 //var RADIUS float32 = (1.0+float32(math.Sqrt(1.0-4.0*math.Sqrt(float64(JULIA_CONST_RE*JULIA_CONST_RE+JULIA_CONST_IM*JULIA_CONST_IM)))))/2.0
 const RADIUS float32 = 2.0
+var JULIA_CONST_SPIN float32 = 0.0
+const JULIA_CONST_INC float32 = 0.01*math.Pi
 func main() {
     mod_begin_color := flag.String("c1", "0,255,0", "color 1 in RGB list format")
     mod_end_color := flag.String("c2", "0,0,0", "color 2 in RGB list format")
-//    do_spin := flag.Bool("spin", false, "changes constant with time")
 
     flag.Usage = cmd_usage
 
@@ -170,6 +182,10 @@ func main() {
                     pos_x = 0.0
                     pos_y = 0.0
                     zoom = 1.0
+                    draw_frame(s, styles, zoom, pos_x, pos_y)
+                }
+                if ev.Rune() == 's' || ev.Rune() == 'r' {
+                    increment_constant()
                     draw_frame(s, styles, zoom, pos_x, pos_y)
                 }
             }
